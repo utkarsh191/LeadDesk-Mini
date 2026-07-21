@@ -70,7 +70,7 @@ const token = jwt.sign(
         id: user._id,
         email: user.email
     },
-    "mysecretkey",
+    process.env.JWT_SECRET,
     {
         expiresIn: "1d"
     }
@@ -91,14 +91,22 @@ return res.status(200).json({
 };
 
 
-const profile = (req, res) => {
+const profile = async (req, res) => {
+    try {
 
-    return res.status(200).json({
-        message: "Welcome to Profile",
-        user: req.user
-    });
+        const user = await User.findById(req.user.id).select("-password");
 
+        return res.status(200).json(user);
+
+    } catch (err) {
+
+        return res.status(500).json({
+            message: err.message
+        });
+
+    }
 };
+
 
 module.exports = {
     signup,
