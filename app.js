@@ -1,16 +1,36 @@
 require("dotenv").config();
+
 const express = require("express");
+const cors = require("cors");
+
 const connectDB = require("./config/db");
+
 const authRoutes = require("./routes/authRoutes");
+const leadRoutes = require("./routes/leadRoutes");
 
 const app = express();
 
+// Database Connection
 connectDB();
 
+// Middleware
+app.use(cors());
 app.use(express.json());
 
+// Routes
 app.use("/api/auth", authRoutes);
+app.use("/api/leads", leadRoutes);
 
-app.listen(3000, () => {
-    console.log("Server Started");
+// Test Route
+app.get("/", (req, res) => {
+    res.status(200).json({
+        success: true,
+        message: "LeadDesk Mini API Running..."
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`🚀 Server running on port ${PORT}`);
 });

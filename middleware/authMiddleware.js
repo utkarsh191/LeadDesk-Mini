@@ -1,25 +1,17 @@
 const jwt = require("jsonwebtoken");
-const BlacklistToken = require("../models/BlacklistToken");
 
-const authMiddleware = async (req, res, next) => {
+const authMiddleware = (req, res, next) => {
     try {
         const authHeader = req.headers.authorization;
 
         if (!authHeader || !authHeader.startsWith("Bearer ")) {
             return res.status(401).json({
-                message: "Token Missing"
+                success: false,
+                message: "Access Denied. Token Missing"
             });
         }
 
         const token = authHeader.split(" ")[1];
-
-        const blacklistedToken = await BlacklistToken.findOne({ token });
-
-        if (blacklistedToken) {
-            return res.status(401).json({
-                message: "Token Expired. Please Login Again."
-            });
-        }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
@@ -29,7 +21,8 @@ const authMiddleware = async (req, res, next) => {
 
     } catch (err) {
         return res.status(401).json({
-            message: "Invalid Token"
+            success: false,
+            message: "Invalid or Expired Token"
         });
     }
 };
